@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>{{ name }}</h2>
+    <em>by</em> <a href="{{ url_for('show_artist', artist_id=artist_id) }}" class=hiddenlink>{{ display_artist }}</a>
+    -
+    <a href="{{ url_for('add_album_playlist', album_id=album_id) }}">(add all)</a>
+    <h3>Tracks</h3>
+    <ul class=boxlist>
+        {% for tk in tracks %}
+        <li>
+            <a href={{ url_for('show_track', track_id=tk.track_id) }}>{{ tk.display_name }}</a>
+            {% if tk.display_artist != display_artist %}
+            <em>as</em> {{ tk.display_artist }}
+            {% endif %}
+            {% if tk.display_album != name %}
+            <em>under title</em> {{ tk.display_album }}
+            {% endif %}
+            - <a href="{{ url_for('add_playlist', track_id=tk.track_id) }}">(add)</a></li>
+        {% else %}
+        <em>(no tracks to show)</em>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('show_artist', artist_id=artist_id) }}">(view this artist)</a>
+    <a href="{{ url_for('show_albums') }}">(view all albums)</a>
+ {% endblock %}

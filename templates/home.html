@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Search</h2>
+    <form action="{{ url_for('search', category='all') }}" method=post>
+        <input type=text class=searchbar name=search placeholder="Search...">
+    </form>
+    <h2>Browse</h2>
+    <ul class=simplelist>
+        <li><a href={{ url_for('show_artists') }}>Artists</a>
+        <li><a href={{ url_for('show_albums') }}>Albums</a>
+        <li><a href={{ url_for('show_tracks', offset=1) }}>Tracks</a>
+    </ul>
+{% endblock %}

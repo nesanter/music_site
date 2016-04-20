@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Search Results</h2>
+    {% if category == "all" or category == "track" %}
+    <h3>Tracks</h3>
+    <ul class=boxlist>
+        {% for tk in track_matches %}
+        <li>
+            <a href={{ url_for('show_track', track_id=tk.track_id) }}>{{ tk.name }}</a>
+            <em>from</em> <a href="{{ url_for('show_album', album_id=tk.album_id) }}" class=hiddenlink>{{ tk.display_album }}</a>
+            <em>by</em> <a href="{{ url_for('show_artist', artist_id=tk.artist_id) }}" class=hiddenlink>{{ tk.display_artist }}</a>
+            -
+            <a href="{{ url_for('add_playlist', track_id=tk.track_id) }}">(add)</a></li>
+        {% else %}
+        <em>(no tracks to show)</em>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if category == "all" or category == "album" %}
+    <h3>Albums</h3>
+    <ul class=boxlist>
+        {% for al in album_matches %}
+        <li>
+            <a href={{ url_for('show_album', album_id=al.album_id) }}>{{ al.name }}</a>
+            <em>by</em> <a href="{{ url_for('show_artist', artist_id=al.artist_id) }}">{{ al.display_artist }}</a>
+            -
+            <a href="{{ url_for('add_album_playlist', album_id=al.album_id) }}">(add all)</a></li>
+        {% else %}
+        <em>(no albums to show)</em>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if category == "all" or category == "artist" %}
+    <h3>Artists</h3>
+    <ul class=boxlist>
+        {% for a in artist_matches %}
+        <li>
+            <a href={{ url_for('show_artist', artist_id=a.artist_id) }}>{{ a.name }}</a>
+            -
+            <a href="{{ url_for('add_artist_playlist', artist_id=a.artist_id) }}">(add all)</a></li>
+        {% else %}
+        <em>(no artists to show)</em>
+        {% endfor %}
+    </ul>
+    {% endif %}
+ {% endblock %}

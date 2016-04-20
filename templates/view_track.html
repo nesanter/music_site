@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>{{ entries.ttitle|safe }} - <a href=/artists/view/{{ entries.artistid }}>{{ entries.dartist|safe }}</a></h2>
+    <em>From </em><a href=/albums/view/{{ entries.albumid }}>{{ entries.dalbum|safe }}</a>
+    <p>
+{% endblock %}

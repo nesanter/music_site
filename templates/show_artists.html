@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Search Artists</h2>
+    <form action="{{ url_for('search', category='artist') }}" method=post>
+        <input type=text class=searchbar name=search placeholder="Search...">
+    </form>
+    <h2>Artists</h2>
+    <ul class=boxlist>
+        {% for a in artists %}
+        <li><a href={{ url_for('show_artist', artist_id=a.artist_id) }}>{{ a.name }}</a> [{{ a.n_albums}} {% if a.n_albums == 1 %}album{% else %}albums{% endif %}]</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('show_home') }}">(home)</a>
+{% endblock %}

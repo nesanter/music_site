@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Modify Database</h2>
+    <form action="{{ url_for('modify_database_submit') }}" method=post>
+        <textarea class=modifybox name=modify></textarea>
+        <input type=submit value="Commit">
+    </form>
+    <br />
+    <a href="{{ url_for('show_home') }}">(home)</a>
+{% endblock %}

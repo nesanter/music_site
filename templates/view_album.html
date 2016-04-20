@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>{{ entries.atitle|safe }} - <a href=/artists/view/{{ entries.artistid }}>{{ entries.dartist|safe }}</a></h2>
+    <p>
+    <ul class=entries>
+    {% for track in albumtracks %}
+    <li>({{ track.tnum }}) <a href={{ url_for('view_track', trackid=track.trackid) }}>{{ track.ttitle|safe }}</a>
+    {% else %}
+        <li><em>No tracks to show</em>
+    {% endfor %}
+    </ul>
+{% endblock %}

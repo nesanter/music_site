@@ -1,0 +1,40 @@
+<!doctype html>
+<title>Music</title>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+    <h1>Music</h1>
+    {% block body %}{% endblock %}
+</div>
+
+<div class=page>
+    <h1>Playlist</h1>
+    <ul class=boxlist>
+    {% for tk in playlist %}
+    <li>
+        <b><a href={{ url_for('show_track', track_id=tk.track_id) }} class=hiddenlink>{{ tk.title }}</a></b>
+        <i>from</i>
+        <a href={{ url_for('show_album', album_id=tk.album_id) }} class=hiddenlink>{{ tk.album }}</a>
+        <i>by</i>
+        <a href={{ url_for('show_artist', artist_id=tk.artist_id) }} class=hiddenlink>{{ tk.artist }}</a>
+        -
+        <a href={{ url_for('remove_playlist', position=tk.position) }}>(remove)</a>
+        <a href={{ url_for('raise_playlist', position=tk.position) }}>(move up)</a>
+        <a href={{ url_for('top_playlist', position=tk.position) }}>(move to top)</a>
+        <a href={{ url_for('stream_playlist_from', start=tk.position) }}>(play here)</a>
+    </li>
+    {% else %}
+    <em>(empty)</em>
+    {% endfor %}
+    </ul>
+
+    <a href={{ url_for('stream_playlist') }}>(play)</a>
+    <a href={{ url_for('flush_playlist') }}>(flush)</a>
+</div>
+
+<div class=page>
+    <span class=about>
+        Site design by Noah Santer (santerkrupp@gmail.com)
+    </span>
+</div>
+

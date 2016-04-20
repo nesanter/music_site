@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Search Albums</h2>
+    <form action="{{ url_for('search', category='album') }}" method=post>
+        <input type=text class=searchbar name=search placeholder="Search...">
+    </form>
+    <h2>Albums</h2>
+    <ul class=boxlist>
+    {% for al in albums %}
+    <li><a href="{{ url_for('show_album', album_id=al.album_id) }}">{{ al.name }}</a>
+        <em>by</em>
+        <a href="{{ url_for('show_artist', artist_id=al.artist_id) }}" class=hiddenlink>{{ al.display_artist }}</a>
+        [{{ al.n_tracks }} {% if al.n_tracks == 1 %} track{% else %} tracks{% endif %}]
+        -
+        <a href="{{url_for('add_album_playlist', album_id=al.album_id)}}">(add all)</a>
+    </li>
+    {% else %}
+        <li><em>(no albums to show)</em>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('show_home') }}">(home)</a>
+{% endblock %}

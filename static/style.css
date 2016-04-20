@@ -1,0 +1,33 @@
+body { font-family: sans-serif; background: #d0d0d0; }
+h1, h2, h3 { color: #9966ff; }
+a { color: #8000ff; }
+h1, h2 { font-family: 'Georgia', serif; margin: 0; }
+h1 { border-bottom: 2px solid #bbb; font-size: 1.2em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.2em; }
+
+.page { margin: 2em auto; width: 35em; border: 5px solid #aaa;
+        padding: 0.8em; background: #e0e0e0; }
+
+.searchbar { font-size: 1.0em; border: none; border-bottom: 2px solid #7070ff; margin-bottom: 1em; background: #f0f0f0; width: 98%; }
+
+input[type=submit] { background-color: #0066cc; border: none; padding: 1em 1.5em; text-decoration: none; margin: 0.8em 0.6em; cursor: pointer; font-weight: bold; }
+
+.simplelist { list-style: none; margin: 0; padding: 0; padding-bottom: 0.75em; }
+.simplelist li { margin: 0.8em 1.2em; }
+.simplelist li h2 { margin-left: -1em; }
+
+.boxlist { list-style: none;  margin: 0; padding: 0; padding-top: 0.5em; padding-bottom: 1.0em; }
+.boxlist li { border-bottom: 1px solid #aaa; margin: 0.8em 0.7em; padding-bottom: 0.5em; }
+.boxlist li h2 { margin-left: -1em; }
+
+.subboxlist { list-style: none; margin: 0; padding: 0; padding-top: 0.0em; padding-bottom: 0.5em; }
+.subboxlist li { border-left: 1px solid #aaa; margin: 0.0em 1.7em; padding-left: 0.5em; padding-bottom: 0.5em; margin-top: 0.5em; }
+
+.hiddenlink { color: black; }
+
+.modifybox { font-family: monospace; font-size: 1em; background: #f0f0f0; border: 1px solid #7070ff; width: 95%; max-width: 95%; }
+
+.about { font-size: 0.8em; }
+
+.error { font-style: italic; font-size: 1.0em; }

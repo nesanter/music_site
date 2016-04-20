@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Search Tracks</h2>
+    <form action="{{ url_for('search', category='track') }}" method=post>
+        <input type=text class=searchbar name=search placeholder="Search...">
+    </form>
+    <h2>Tracks</h2>
+    <ul class=boxlist>
+    {% for tk in tracks %}
+    <li><a href="{{ url_for('show_track', track_id=tk.track_id) }}">{{ tk.name }}</a>
+        <em>by</em>
+        <a href="{{ url_for('show_artist', artist_id=tk.artist_id) }}" class=hiddenlink>{{ tk.display_artist }}</a>
+        <em>from</em>
+        <a href="{{ url_for('show_album', album_id=tk.album_id) }}" class=hiddenlink>{{ tk.display_album }}</a>
+        -
+        <a href="{{url_for('add_playlist', track_id=tk.track_id)}}">(add)</a>
+    </li>
+    {% else %}
+        <li><em>(no tracks to show)</em>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('show_tracks', offset=next_offset) }}">(more)</a>
+    <br />
+    <a href="{{ url_for('show_home') }}">(home)</a>
+{% endblock %}
