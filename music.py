@@ -1,3 +1,6 @@
+
+# music.py : music site Flask app
+# music_site copyright (C) 2016 Noah Santer (santerkrupp@gmail.com)
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, Response, stream_with_context
 from contextlib import closing
