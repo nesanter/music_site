@@ -6,6 +6,7 @@ CREATE TABLE tracks (
     display_album TEXT,
     filename TEXT,
     filetype TEXT,
+    num INTEGER,
     album_id INTEGER,
     artist_id INTEGER,
     FOREIGN KEY(album_id) REFERENCES albums(id),

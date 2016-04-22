@@ -83,21 +83,21 @@ def search(category):
 
 @app.route('/artists/')
 def show_artists():
-    cur = g.db.execute('SELECT artists.id, artists.canonical_name, COUNT(albums.id) FROM artists INNER JOIN albums ON albums.artist_id = artists.id GROUP BY artists.id')
+    cur = g.db.execute('SELECT artists.id, artists.canonical_name, COUNT(albums.id) FROM artists INNER JOIN albums ON albums.artist_id = artists.id GROUP BY artists.id ORDER BY artists.canonical_name ASC')
     entries = [dict(artist_id=row[0], name=row[1], n_albums=row[2]) for row in cur.fetchall()]
     
     return render_template('show_artists.html', playlist=get_playlist(), artists=entries)
 
 @app.route('/albums/')
 def show_albums():
-    cur = g.db.execute('SELECT albums.id, albums.canonical_name, albums.artist_id, albums.display_artist, COUNT(tracks.id) FROM albums INNER JOIN tracks ON albums.id = tracks.album_id GROUP BY albums.id')
+    cur = g.db.execute('SELECT albums.id, albums.canonical_name, albums.artist_id, albums.display_artist, COUNT(tracks.id) FROM albums INNER JOIN tracks ON albums.id = tracks.album_id GROUP BY albums.id ORDER BY albums.canonical_name ASC')
     entries = [dict(album_id=row[0], name=row[1], artist_id=row[2], display_artist=row[3], n_tracks=row[4]) for row in cur.fetchall()]
 
     return render_template('show_albums.html', playlist=get_playlist(), albums=entries)
 
 @app.route('/tracks/from/<offset>')
 def show_tracks(offset):
-    cur = g.db.execute('SELECT id, display_name, display_artist, display_album, artist_id, album_id FROM tracks LIMIT 50 OFFSET (? - 1)', [offset])
+    cur = g.db.execute('SELECT id, display_name, display_artist, display_album, artist_id, album_id FROM tracks LIMIT 50 OFFSET (? - 1) ORDER BY display_name ASC', [offset])
     entries = [dict(track_id=row[0], name=row[1], display_artist=row[2], display_album=row[3], artist_id=row[4], album_id=row[5]) for row in cur.fetchall()]
 
     return render_template('show_tracks.html', playlist=get_playlist(), tracks=entries, next_offset=int(offset) + 50)
@@ -110,10 +110,10 @@ def show_artist(artist_id):
     if len(names) != 1:
         return render_template('error.html', playlist=[])
 
-    cur = g.db.execute('SELECT id, canonical_name, display_artist FROM albums WHERE artist_id = ?', [artist_id])
+    cur = g.db.execute('SELECT id, canonical_name, display_artist FROM albums WHERE artist_id = ? ORDER BY canonical_name ASC', [artist_id])
     albums = [dict(album_id=row[0], name=row[1], display_artist=row[2]) for row in cur.fetchall()]
 
-    cur = g.db.execute('SELECT id, display_name, album_id FROM tracks WHERE artist_id = ?', [artist_id])
+    cur = g.db.execute('SELECT id, display_name, album_id FROM tracks WHERE artist_id = ? ORDER BY num ASC', [artist_id])
     tracks = [dict(track_id=row[0], name=row[1], album_id=row[2]) for row in cur.fetchall()]
 
     return render_template('show_artist.html', playlist=get_playlist(), artist_id=artist_id, name=names[0], albums=albums, tracks=tracks)
@@ -126,7 +126,7 @@ def show_album(album_id):
     if len(info) != 1:
         return render_template('error.html', playlist=[])
 
-    cur = g.db.execute('SELECT id, display_name, display_album, display_artist FROM tracks WHERE album_id = ?', [album_id])
+    cur = g.db.execute('SELECT id, display_name, display_album, display_artist FROM tracks WHERE album_id = ? ORDER BY num ASC', [album_id])
     tracks = [dict(track_id=row[0], display_name=row[1], display_album=row[2], display_artist=row[3]) for row in cur.fetchall()]
 
     return render_template('show_album.html', playlist=get_playlist(), album_id=album_id, name=info[0]['name'], display_artist=info[0]['display_artist'], artist_id=info[0]['artist_id'], tracks=tracks)
@@ -180,7 +180,7 @@ def add_playlist(track_id):
 
 @app.route('/add/album/<album_id>')
 def add_album_playlist(album_id):
-    cur = g.db.execute('SELECT id FROM tracks WHERE album_id = ?', [album_id])
+    cur = g.db.execute('SELECT id FROM tracks WHERE album_id = ? ORDER BY num ASC', [album_id])
     for track_id in [row[0] for row in cur.fetchall()]:
         g.db.execute('INSERT INTO playlist (track_id, position) VALUES (?, (SELECT COUNT(track_id) FROM playlist) + 1)', [track_id])
     g.db.commit()
@@ -188,7 +188,7 @@ def add_album_playlist(album_id):
 
 @app.route('/add/artist/<artist_id>')
 def add_artist_playlist(artist_id):
-    cur = g.db.execute('SELECT id FROM tracks WHERE artist_id = ?', [artist_id])
+    cur = g.db.execute('SELECT id FROM tracks WHERE artist_id = ? ORDER BY album_id, num ASC', [artist_id])
     for track_id in [row[0] for row in cur.fetchall()]:
         g.db.execute('INSERT INTO playlist (track_id, position) VALUES (?, (SELECT COUNT(track_id) FROM playlist) + 1)', [track_id])
     g.db.commit()
@@ -314,9 +314,9 @@ def update_from_files(basedir):
                             else:
                                 arid, alid, trid = update_db(pd, basedir)
                                 print(arid, alid, trid)
-                                pd['ar_id'] = arid
-                                pd['al_id'] = alid
-                                pd['tr_id'] = trid
+                                #pd['ar_id'] = arid
+                                #pd['al_id'] = alid
+                                #pd['tr_id'] = trid
 
                                 arn, aln, trn = expand_parsed(pd)
 
@@ -383,30 +383,38 @@ def update_db(parsed, basedir=''):
             db.execute('INSERT INTO artists (canonical_name) VALUES (?)', [parsed['ar_can_name']])
             cur = db.execute('SELECT LAST_INSERT_ROWID()')
             ar_id = [row[0] for row in cur.fetchall()][0]
+            parsed['ar_id'] = ar_id
+            ar_id_new = True
         else:
             db.execute('INSERT OR REPLACE INTO artists (id, canonical_name) VALUES (?, ?)', [parsed['ar_id'], parsed['ar_can_name']])
             ar_id = parsed['ar_id']
+            ar_id_new = False
 
         if parsed['al_id'] == 'null':
             db.execute('INSERT INTO albums (canonical_name, display_artist, artist_id) VALUES (?, ?, ?)', 
                     [parsed['al_can_name'], parsed['al_disp_ar'], ar_id])
             cur = db.execute('SELECT LAST_INSERT_ROWID()')
             al_id = [row[0] for row in cur.fetchall()][0]
+            parsed['al_id'] = al_id
+            al_id_new = True
         else:
             db.execute('INSERT OR REPLACE INTO albums (id, canonical_name, display_artist, artist_id) VALUES (?, ?, ?, ?)', 
                     [parsed['al_id'], parsed['al_can_name'], parsed['al_disp_ar'], ar_id])
             al_id = parsed['al_id']
+            al_id_new = False
 
         if parsed['tr_id'] == 'null':
-            db.execute('INSERT INTO tracks (display_name, display_artist, display_album, album_id, artist_id, filetype) VALUES (?, ?, ?, ?, ?, ?)',
-                    [parsed['tr_can_name'], parsed['tr_disp_ar'], parsed['tr_disp_al'], al_id, ar_id, parsed['tr_ext']])
+            db.execute('INSERT INTO tracks (num, display_name, display_artist, display_album, album_id, artist_id, filetype) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [parsed['tr_num'], parsed['tr_can_name'], parsed['tr_disp_ar'], parsed['tr_disp_al'], al_id, ar_id, parsed['tr_ext']])
             cur = db.execute('SELECT LAST_INSERT_ROWID()')
             tr_id = [row[0] for row in cur.fetchall()][0]
             parsed['tr_id'] = tr_id
+            tr_id_new = True
         else:
-            db.execute('INSERT OR REPLACE INTO tracks (id, display_name, display_artist, display_album, album_id, artist_id, filetype) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [parsed['tr_id'], parsed['tr_can_name'], parsed['tr_disp_ar'], parsed['tr_disp_al'], al_id, ar_id, parsed['tr_ext']])
+            db.execute('INSERT OR REPLACE INTO tracks (id, num, display_name, display_artist, display_album, album_id, artist_id, filetype) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [parsed['tr_id'], parsed['tr_num'], parsed['tr_can_name'], parsed['tr_disp_ar'], parsed['tr_disp_al'], al_id, ar_id, parsed['tr_ext']])
             tr_id = parsed['tr_id']
+            tr_id_new = False
 
         fname = os.path.join(basedir, *expand_parsed(parsed))
 
@@ -415,7 +423,7 @@ def update_db(parsed, basedir=''):
 
 
         db.commit()
-        return (ar_id, al_id, tr_id)
+        return (ar_id_new, al_id_new, tr_id_new)
 
 if __name__ == "__main__":
     app.run()
